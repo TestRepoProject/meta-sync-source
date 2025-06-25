@@ -1,0 +1,32 @@
+name: Reusable Metadata Sync
+
+on:
+  workflow_call:
+    secrets:
+      GH_TOKEN:
+        required: true
+    inputs:
+      sync_labels:
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install requirements (optional)
+        run: pip install -r scripts/requirements.txt || true
+
+      - name: Run Label Sync Script
+        if: ${{ inputs.sync_labels }}
+        run: |
+          export GH_TOKEN=${{ secrets.GH_TOKEN }}
+          python3 scripts/sync_labels.py
